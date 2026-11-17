@@ -1,4 +1,4 @@
-# 🎓 AirSense: Viva Voce & Technical Defense Guide
+# 🎓 Vayu: Viva Voce & Technical Defense Guide
 ## Top 25 College CSE Viva Questions & Expert Answers
 
 ---
@@ -100,10 +100,10 @@
 >    - **Telegram Bot API:** Transmitting instant push notifications via Telegram HTTP webhook.
 > 3. All secrets are loaded strictly from `.env` via `python-dotenv`.
 
-#### Q16: How is CI/CD and MLOps implemented in AirSense?
+#### Q16: How is CI/CD and MLOps implemented in Vayu?
 > **Answer:** We configured a **GitHub Actions workflow** (`.github/workflows/retrain_and_refresh.yml`) that runs on a scheduled cron (`0 0 * * *`, daily at midnight UTC / 05:30 AM IST). It automatically sets up Python 3.11, validates data, pulls updated Open-Meteo weather data, retrains forecasting models, recalculates SHAP figures, checks alert thresholds, and commits updated model artifacts back to the repository.
 
-#### Q17: Which United Nations Sustainable Development Goals does AirSense address?
+#### Q17: Which United Nations Sustainable Development Goals does Vayu address?
 > **Answer:**
 > - **SDG 3 (Good Health and Well-being) - Target 3.9:** Substantially reducing mortality and morbidity from hazardous air pollution through predictive, personalized early warnings.
 > - **SDG 11 (Sustainable Cities and Communities) - Target 11.6:** Reducing the adverse environmental impact of cities by improving public awareness and municipal forecasting.

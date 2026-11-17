@@ -1,4 +1,4 @@
-# AirSense: Air Quality Forecasting & Health Alert Platform for Indian Cities
+# Vayu: Air Quality Forecasting & Health Alert Platform for Indian Cities
 ## Academic Project Report & Comprehensive Technical Documentation
 **Bachelor of Technology (B.Tech) in Computer Science & Engineering**
 
@@ -7,7 +7,7 @@
 ### **Abstract**
 Urban air pollution represents one of the most severe public health emergencies in India, with particulate matter ($PM_{2.5}$ and $PM_{10}$) frequently exceeding World Health Organization (WHO) and National Ambient Air Quality Standards (NAAQS) by tenfold. Most existing air quality monitoring applications provide only reactive, current measurements without actionable forward-looking insights or transparency. 
 
-This project presents **AirSense**, an end-to-end Machine Learning and Full-Stack Geospatial Web Platform that delivers:
+This project presents **Vayu**, an end-to-end Machine Learning and Full-Stack Geospatial Web Platform that delivers:
 1. **Multi-Horizon Forecasting:** 24, 48, and 72-hour Air Quality Index (AQI) forecasts across 8 major Indian metropolitan hubs (*Delhi, Mumbai, Kolkata, Chennai, Bengaluru, Hyderabad, Ahmedabad, and Jaipur*).
 2. **Atmospheric Feature Engineering:** Fusion of historical pollutant concentrations with real-time Open-Meteo meteorological variables (*temperature, relative humidity, wind speed, precipitation*) and cyclical time harmonics.
 3. **Rigorous ML Benchmarking:** A leakage-free chronological train/validation/test split evaluating Naive Persistence ($y_{t+1}=y_t$), XGBoost, LightGBM, and a PyTorch Long Short-Term Memory (LSTM) network. LightGBM achieved the highest accuracy ($R^2 = 0.8977$, $MAE = 15.66$, $RMSE = 27.00$), representing a **20.56% error reduction** over baseline.
@@ -53,7 +53,7 @@ Existing municipal air monitoring systems suffer from three major shortcomings:
 
 ## Chapter 2: Literature Review & Related Work
 
-| Study / Platform | Methodology | Limitations | AirSense Improvement |
+| Study / Platform | Methodology | Limitations | Vayu Improvement |
 | :--- | :--- | :--- | :--- |
 | **CPCB / SAFAR Official Portals** | Station sensor physical readings | Retrospective only; no multi-day predictive modeling; no user personalization. | Provides 24h–72h proactive ML forecasts and personalized demographic advice. |
 | **Standard ARIMA / SARIMA Studies** | Classical linear autoregression | Fails to model non-linear pollutant interactions and external weather drivers. | Uses gradient-boosted decision trees capable of non-linear weather-pollutant splits. |

@@ -1,6 +1,6 @@
 """
-AirSense - Model Evaluation Module
-Author: AirSense Team
+Vayu - Model Evaluation Module
+Author: Vayu Team
 Description:
     Computes rigorous evaluation metrics (MAE, RMSE, R2, MAPE) for time-series forecasting.
     Includes baseline comparison routines and formats benchmark results into
@@ -108,7 +108,7 @@ def print_markdown_comparison_table(comparison_df: pd.DataFrame) -> str:
     """
     md_str = comparison_df.to_markdown(index=False)
     print("\n" + "=" * 80)
-    print("                     AIRSENSE: MODEL BENCHMARK COMPARISON")
+    print("                     VAYU: MODEL BENCHMARK COMPARISON")
     print("=" * 80)
     print(md_str)
     print("=" * 80 + "\n")

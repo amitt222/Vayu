@@ -1,6 +1,6 @@
 """
-AirSense - Data Preprocessing & Cleaning Module
-Author: AirSense Team
+Vayu - Data Preprocessing & Cleaning Module
+Author: Vayu Team
 Description:
     Provides robust, reproducible data cleaning routines for Indian air quality
     time-series data. Handles sensor dropouts via temporal interpolation,
@@ -270,15 +270,15 @@ def save_cleaned_data(
 if __name__ == "__main__":
     from src.data_loader import load_raw_city_day, filter_target_cities
 
-    print("[AirSense] Starting Data Preprocessing Pipeline...")
+    print("[Vayu] Starting Data Preprocessing Pipeline...")
     raw_df = load_raw_city_day()
     target_df = filter_target_cities(raw_df)
 
-    print(f"[AirSense] Raw target records: {len(target_df)}")
+    print(f"[Vayu] Raw target records: {len(target_df)}")
     cleaned_df = clean_and_preprocess_dataset(target_df)
 
-    print(f"[AirSense] Cleaned records: {len(cleaned_df)}")
-    print(f"[AirSense] Remaining null values in cleaned data:\n{cleaned_df.isna().sum()}")
+    print(f"[Vayu] Cleaned records: {len(cleaned_df)}")
+    print(f"[Vayu] Remaining null values in cleaned data:\n{cleaned_df.isna().sum()}")
 
     saved_path = save_cleaned_data(cleaned_df)
-    print(f"[AirSense] Cleaned dataset successfully saved to: {saved_path}")
+    print(f"[Vayu] Cleaned dataset successfully saved to: {saved_path}")

@@ -1,6 +1,6 @@
 """
-AirSense - Health Advisory & Risk Assessment Module
-Author: AirSense Team
+Vayu - Health Advisory & Risk Assessment Module
+Author: Vayu Team
 Description:
     Maps numerical AQI values to official Central Pollution Control Board (CPCB)
     National Air Quality Index (NAQI) categories and generates tailored, actionable
@@ -222,6 +222,122 @@ HEALTH_ADVISORIES: Dict[str, Dict[str, Dict[str, str]]] = {
 }
 
 
+# Canonical demographic group keys and every label/alias that maps onto them.
+# The Streamlit UI uses human-readable labels ("Elderly & Children"), the alert
+# module uses internal keys ("elderly"); both must resolve to the same advice.
+USER_GROUP_ALIASES: Dict[str, str] = {
+    "general": "general",
+    "general public": "general",
+    "asthma": "asthma",
+    "asthma patients": "asthma",
+    "asthma & respiratory patients": "asthma",
+    "respiratory": "asthma",
+    "elderly": "elderly",
+    "elderly & children": "elderly",
+    "children & elderly": "elderly",
+    "children": "elderly",
+    "seniors": "elderly",
+    "outdoor_workers": "outdoor_workers",
+    "outdoor workers": "outdoor_workers",
+    "workers": "outdoor_workers",
+}
+
+
+def normalize_user_group(user_group: Optional[str]) -> str:
+    """
+    Resolves a UI label or alias to one of the canonical group keys:
+    'general', 'asthma', 'elderly', 'outdoor_workers'. Unknown values map to 'general'.
+    """
+    if not user_group:
+        return "general"
+    return USER_GROUP_ALIASES.get(user_group.lower().strip(), "general")
+
+
+# CPCB NAQI concentration breakpoints per pollutant: (conc_low, conc_high, index_low, index_high).
+# Units: µg/m³ for all pollutants except CO (mg/m³). The final band's upper concentration
+# extends the previous band width so values above the 'Severe' threshold still scale to 500.
+# Reference: CPCB National Air Quality Index (2014) breakpoint table.
+CPCB_BREAKPOINTS: Dict[str, List[tuple]] = {
+    "PM2.5": [(0, 30, 0, 50), (30, 60, 50, 100), (60, 90, 100, 200),
+              (90, 120, 200, 300), (120, 250, 300, 400), (250, 380, 400, 500)],
+    "PM10": [(0, 50, 0, 50), (50, 100, 50, 100), (100, 250, 100, 200),
+             (250, 350, 200, 300), (350, 430, 300, 400), (430, 510, 400, 500)],
+    "NO2": [(0, 40, 0, 50), (40, 80, 50, 100), (80, 180, 100, 200),
+            (180, 280, 200, 300), (280, 400, 300, 400), (400, 520, 400, 500)],
+    "O3": [(0, 50, 0, 50), (50, 100, 50, 100), (100, 168, 100, 200),
+           (168, 208, 200, 300), (208, 748, 300, 400), (748, 1288, 400, 500)],
+    "CO": [(0, 1, 0, 50), (1, 2, 50, 100), (2, 10, 100, 200),
+           (10, 17, 200, 300), (17, 34, 300, 400), (34, 51, 400, 500)],
+    "SO2": [(0, 40, 0, 50), (40, 80, 50, 100), (80, 380, 100, 200),
+            (380, 800, 200, 300), (800, 1600, 300, 400), (1600, 2400, 400, 500)],
+    "NH3": [(0, 200, 0, 50), (200, 400, 50, 100), (400, 800, 100, 200),
+            (800, 1200, 200, 300), (1200, 1800, 300, 400), (1800, 2400, 400, 500)],
+}
+
+POLLUTANT_UNITS: Dict[str, str] = {
+    "PM2.5": "µg/m³", "PM10": "µg/m³", "NO2": "µg/m³", "O3": "µg/m³",
+    "CO": "mg/m³", "SO2": "µg/m³", "NH3": "µg/m³",
+}
+
+# WHO Global Air Quality Guidelines (2021), 24-hour mean limits.
+WHO_24H_GUIDELINES: Dict[str, float] = {"PM2.5": 15.0, "PM10": 45.0, "NO2": 25.0, "SO2": 40.0}
+
+
+def calculate_sub_index(pollutant: str, concentration: Optional[float]) -> Optional[float]:
+    """
+    Computes the CPCB sub-index (0-500) for one pollutant by linear interpolation
+    within its concentration breakpoint band. Returns None for missing/invalid input.
+    """
+    bands = CPCB_BREAKPOINTS.get(pollutant)
+    if bands is None or concentration is None:
+        return None
+    try:
+        conc = float(concentration)
+    except (TypeError, ValueError):
+        return None
+    if conc != conc or conc < 0:  # NaN or negative
+        return None
+
+    for c_lo, c_hi, i_lo, i_hi in bands:
+        if conc <= c_hi:
+            return round(i_lo + (conc - c_lo) * (i_hi - i_lo) / (c_hi - c_lo), 1)
+    return 500.0
+
+
+def get_pollutant_sub_indices(concentrations: Dict[str, Any]) -> List[Dict[str, Any]]:
+    """
+    Computes sub-indices for every pollutant available in `concentrations`,
+    sorted from highest (the dominant / responsible pollutant) to lowest.
+
+    Note: CPCB uses 8-hour maxima for O3 and CO; on daily-mean data these
+    sub-indices are an approximation.
+    """
+    rows: List[Dict[str, Any]] = []
+    for pollutant in CPCB_BREAKPOINTS:
+        sub_index = calculate_sub_index(pollutant, concentrations.get(pollutant))
+        if sub_index is None:
+            continue
+        cat = get_cpcb_category(sub_index)
+        rows.append({
+            "pollutant": pollutant,
+            "concentration": round(float(concentrations[pollutant]), 2),
+            "unit": POLLUTANT_UNITS[pollutant],
+            "sub_index": sub_index,
+            "category": cat["category"],
+            "color": cat["color"],
+        })
+    rows.sort(key=lambda r: r["sub_index"], reverse=True)
+    return rows
+
+
+def pm25_cigarette_equivalent(pm25_24h_mean: float) -> float:
+    """
+    Approximate number of cigarettes per day with equivalent PM2.5 health impact,
+    using the Berkeley Earth rule of thumb: 22 µg/m³ over 24 hours ≈ 1 cigarette.
+    """
+    return round(max(0.0, float(pm25_24h_mean)) / 22.0, 1)
+
+
 def get_cpcb_category(aqi: float) -> Dict[str, Any]:
     """
     Identifies the official CPCB category, scale parameters, and display properties for an AQI value.
@@ -295,18 +411,8 @@ def get_health_advisory(
     category_advisories = HEALTH_ADVISORIES.get(cat_name, HEALTH_ADVISORIES["Severe"])
 
     if user_group:
-        group_key = user_group.lower().strip()
-        # Handle aliases
-        alias_map = {
-            "general public": "general",
-            "asthma patients": "asthma",
-            "respiratory": "asthma",
-            "children": "elderly",
-            "seniors": "elderly",
-            "workers": "outdoor_workers",
-        }
-        group_key = alias_map.get(group_key, group_key)
-        group_advice = category_advisories.get(group_key, category_advisories["general"])
+        group_key = normalize_user_group(user_group)
+        group_advice = category_advisories[group_key]
         return {
             "aqi": aqi,
             "category": cat_name,
@@ -374,7 +480,7 @@ def calculate_outdoor_safety_score(
         "elderly": 1.25,
         "asthma": 1.35,
     }
-    penalty = group_penalty.get(user_group.lower(), 1.0)
+    penalty = group_penalty[normalize_user_group(user_group)]
     adjusted_score = round(max(0.0, min(100.0, 100.0 - ((100.0 - base_score) * penalty))), 1)
 
     # Verdict derivation
@@ -412,7 +518,7 @@ if __name__ == "__main__":
     test_aqis = [35.0, 85.0, 160.0, 260.0, 360.0, 460.0]
 
     print("================================================================================")
-    print("                    AIRSENSE: HEALTH ADVISORY MODULE TEST")
+    print("                    VAYU: HEALTH ADVISORY MODULE TEST")
     print("================================================================================")
 
     for test_aqi in test_aqis:

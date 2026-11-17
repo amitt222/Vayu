@@ -1,4 +1,4 @@
-# AirSense - Dependencies
+# Vayu - Dependencies
 # Python 3.11+
 
 # Core Data Science & Numerical Computing
@@ -19,9 +19,9 @@ seaborn>=0.12.0
 plotly>=5.18.0
 
 # Web Application & Mapping
-streamlit>=1.30.0
+streamlit>=1.65.0
 folium>=0.15.0
-streamlit-folium>=0.16.0
+streamlit-folium>=0.27.0
 
 # API Requests & Environment Management
 requests>=2.31.0

@@ -1,6 +1,6 @@
 """
-AirSense - Automated Alert Notification System
-Author: AirSense Team
+Vayu - Automated Alert Notification System
+Author: Vayu Team
 Description:
     Dispatches automated early-warning health alerts via Email (SMTP) and Telegram
     when forecasted AQI crosses critical regulatory thresholds (e.g., CPCB Poor / Severe).
@@ -79,7 +79,7 @@ def build_alert_message_text(
     mask_adv = adv_dict.get("general", {}).get("mask", "N95 Respirator recommended.")
 
     return (
-        f"🚨 AIRSENSE AIR QUALITY ALERT: {city.upper()} 🚨\n\n"
+        f"🚨 VAYU AIR QUALITY ALERT: {city.upper()} 🚨\n\n"
         f"⚠️ Hazard Level: {category.upper()} (Forecast AQI: {forecast_aqi:.0f})\n"
         f"⏱️ Forecast Horizon: Next {horizon_hours} Hours\n"
         f"🎯 Alert Threshold Exceeded: {threshold:.0f} AQI\n\n"
@@ -88,8 +88,8 @@ def build_alert_message_text(
         f"• Mask Recommendation: {mask_adv}\n\n"
         f"🫁 Sensitive & Asthma Patients:\n"
         f"• {asthma_adv}\n\n"
-        f"🔗 Stay safe and check full forecasts on the AirSense Dashboard.\n"
-        f"— Automated dispatch by AirSense Monitoring System"
+        f"🔗 Stay safe and check full forecasts on the Vayu Dashboard.\n"
+        f"— Automated dispatch by Vayu Monitoring System"
     )
 
 
@@ -140,14 +140,14 @@ def build_alert_message_html(
     <body>
         <div class="container">
             <div class="header">
-                <h1 style="margin: 0; font-size: 24px;">🚨 AirSense Early Warning Alert</h1>
-                <p style="margin: 6px 0 0 0; font-size: 15px;">Critical Air Pollution Detected in <b>{city}</b></p>
+                <h1 style="margin: 0; font-size: 24px;">🚨 Vayu Early Warning Alert</h1>
+                <p style="margin: 6px 0 0 0; font-size: 15px;">Air quality forecast for <b>{city}</b></p>
                 <div style="margin-top: 12px;">
                     <span class="badge">{category.upper()} • {forecast_aqi:.0f} AQI</span>
                 </div>
             </div>
             <div class="content">
-                <p>The <b>AirSense ML Forecasting Engine</b> predicts that atmospheric air quality in <b>{city}</b> will cross your safe threshold of <b>{threshold:.0f} AQI</b> over the next <b>{horizon_hours} hours</b>.</p>
+                <p>The <b>Vayu ML Forecasting Engine</b> forecasts an AQI of <b>{forecast_aqi:.0f}</b> ({category}) in <b>{city}</b> over the next <b>{horizon_hours} hours</b>, against your alert threshold of <b>{threshold:.0f} AQI</b>.</p>
 
                 <h3 style="color: #222; margin-top: 20px;">🛡️ Targeted Health Actions</h3>
 
@@ -170,8 +170,8 @@ def build_alert_message_html(
                 </div>
             </div>
             <div class="footer">
-                AirSense Platform • College CSE Project • UN SDG 3 & 11 Compliant<br>
-                Automated telemetry alert sent from AirSense Intelligence
+                Vayu Platform • College CSE Project • UN SDG 3 & 11 Compliant<br>
+                Automated telemetry alert sent from Vayu Intelligence
             </div>
         </div>
     </body>
@@ -199,7 +199,7 @@ def send_telegram_alert(
     chat = chat_id or TELEGRAM_CHAT_ID
 
     if not token or not chat:
-        print("[AirSense Alert Warning] Telegram bot token or chat ID not set in .env. Skipping dispatch.")
+        print("[Vayu Alert Warning] Telegram bot token or chat ID not set in .env. Skipping dispatch.")
         return False
 
     url = f"https://api.telegram.org/bot{token}/sendMessage"
@@ -211,10 +211,10 @@ def send_telegram_alert(
     try:
         response = requests.post(url, json=payload, timeout=10)
         response.raise_for_status()
-        print(f"[AirSense Alert] Telegram alert dispatched successfully to chat ID: {chat}")
+        print(f"[Vayu Alert] Telegram alert dispatched successfully to chat ID: {chat}")
         return True
     except Exception as exc:
-        print(f"[AirSense Alert Error] Failed sending Telegram alert: {exc}")
+        print(f"[Vayu Alert Error] Failed sending Telegram alert: {exc}")
         return False
 
 
@@ -246,12 +246,12 @@ def send_email_alert(
     port = server_port or SMTP_PORT
 
     if not s_email or not s_pass or not r_email:
-        print("[AirSense Alert Warning] SMTP email credentials not configured in .env. Skipping dispatch.")
+        print("[Vayu Alert Warning] SMTP email credentials not configured in .env. Skipping dispatch.")
         return False
 
     msg = MIMEMultipart("alternative")
     msg["Subject"] = subject
-    msg["From"] = f"AirSense Alert <{s_email}>"
+    msg["From"] = f"Vayu Alert <{s_email}>"
     msg["To"] = r_email
 
     msg.attach(MIMEText(text_body, "plain"))
@@ -266,10 +266,10 @@ def send_email_alert(
             server.login(s_email, s_pass)
             server.send_message(msg)
 
-        print(f"[AirSense Alert] Email notification delivered to {r_email}")
+        print(f"[Vayu Alert] Email notification delivered to {r_email}")
         return True
     except Exception as exc:
-        print(f"[AirSense Alert Error] Failed delivering email alert: {exc}")
+        print(f"[Vayu Alert Error] Failed delivering email alert: {exc}")
         return False
 
 
@@ -333,7 +333,7 @@ def evaluate_and_dispatch_alerts(
         advisories=advisories,
     )
 
-    subject = f"⚠️ AirSense Alert: High AQI ({forecast_aqi:.0f} - {cat_info['category']}) Forecasted in {city}"
+    subject = f"⚠️ Vayu Alert: High AQI ({forecast_aqi:.0f} - {cat_info['category']}) Forecasted in {city}"
 
     # Dispatch to Telegram
     if is_telegram_configured() or force_send:
@@ -352,7 +352,7 @@ def simulate_alert_dry_run(city: str = "Delhi", test_aqi: float = 278.0) -> None
     Runs a safe demonstration dry-run printing formatted alert messages and credentials status.
     """
     print("\n" + "=" * 80)
-    print("                 AIRSENSE: ALERT MODULE DRY-RUN SIMULATION")
+    print("                 VAYU: ALERT MODULE DRY-RUN SIMULATION")
     print("=" * 80)
 
     print("\n[Credential Configuration Status]")

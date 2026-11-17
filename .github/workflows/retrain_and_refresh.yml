@@ -1,4 +1,4 @@
-name: AirSense - Scheduled Data Refresh & Model Retraining
+name: Vayu - Scheduled Data Refresh & Model Retraining
 
 on:
   schedule:
@@ -18,7 +18,7 @@ permissions:
 
 jobs:
   pipeline:
-    name: Execute AirSense Pipeline
+    name: Execute Vayu Pipeline
     runs-on: ubuntu-latest
 
     steps:

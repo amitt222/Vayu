@@ -1,1 +1,1 @@
-"""AirSense Streamlit App Package."""
+"""Vayu Streamlit App Package."""

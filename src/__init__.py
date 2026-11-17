@@ -1,5 +1,5 @@
 """
-AirSense: Air Quality Forecasting and Health Alert Platform for Indian Cities.
+Vayu: Air Quality Forecasting and Health Alert Platform for Indian Cities.
 Core library package.
 """
 

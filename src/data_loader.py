@@ -1,6 +1,6 @@
 """
-AirSense - Data Loader Module
-Author: AirSense Team
+Vayu - Data Loader Module
+Author: Vayu Team
 Description:
     Responsible for locating, validating, loading, and filtering the historical
     air quality dataset (city_day.csv) from Kaggle's "Air Quality Data in India".
@@ -38,7 +38,7 @@ def get_dataset_download_instructions() -> str:
     return (
         "\n"
         "================================================================================\n"
-        "                     AIRSENSE: DATASET DOWNLOAD INSTRUCTIONS\n"
+        "                     VAYU: DATASET DOWNLOAD INSTRUCTIONS\n"
         "================================================================================\n"
         "The historical dataset 'city_day.csv' was not found in 'data/raw/'.\n\n"
         "Please follow these steps to download the official dataset:\n"
@@ -111,7 +111,7 @@ def filter_target_cities(
     cities: Optional[List[str]] = None
 ) -> pd.DataFrame:
     """
-    Filters the dataset to only include the target cities for AirSense.
+    Filters the dataset to only include the target cities for Vayu.
 
     Args:
         df (pd.DataFrame): Input DataFrame containing a 'City' column.
@@ -153,9 +153,9 @@ def get_data_summary(df: pd.DataFrame) -> dict[str, Any]:
 
 
 if __name__ == "__main__":
-    print("[AirSense] Checking dataset availability...")
+    print("[Vayu] Checking dataset availability...")
     if check_raw_data_exists(DEFAULT_DATA_PATH):
-        print(f"[AirSense] Found dataset at '{DEFAULT_DATA_PATH}'. Loading...")
+        print(f"[Vayu] Found dataset at '{DEFAULT_DATA_PATH}'. Loading...")
         raw_df = load_raw_city_day(DEFAULT_DATA_PATH)
         filtered_df = filter_target_cities(raw_df)
 

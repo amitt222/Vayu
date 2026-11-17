@@ -1,6 +1,6 @@
 """
-AirSense - Feature Engineering Module
-Author: AirSense Team
+Vayu - Feature Engineering Module
+Author: Vayu Team
 Description:
     Transforms cleaned air quality time-series data into feature-rich tabular representations
     for machine learning forecasting (24h, 48h, 72h).
@@ -98,7 +98,7 @@ def fetch_open_meteo_weather_for_city(
         return weather_df
 
     except Exception as exc:
-        print(f"[AirSense Weather Warning] Failed fetching weather for {city}: {exc}")
+        print(f"[Vayu Weather Warning] Failed fetching weather for {city}: {exc}")
         return pd.DataFrame(columns=["Date", "City", "temp_mean", "humidity_mean", "precipitation", "wind_speed_max", "wind_direction"])
 
 
@@ -122,11 +122,11 @@ def get_cached_or_fetch_weather(
         pd.DataFrame: Weather dataset.
     """
     if cache_path.is_file():
-        print(f"[AirSense Weather] Loading cached weather from: {cache_path}")
+        print(f"[Vayu Weather] Loading cached weather from: {cache_path}")
         df = pd.read_csv(cache_path, parse_dates=["Date"])
         return df
 
-    print(f"[AirSense Weather] Cache not found. Fetching from Open-Meteo API ({start_date} to {end_date})...")
+    print(f"[Vayu Weather] Cache not found. Fetching from Open-Meteo API ({start_date} to {end_date})...")
     records: List[pd.DataFrame] = []
     for city in cities:
         print(f"  -> Querying Open-Meteo for {city}...")
@@ -135,14 +135,14 @@ def get_cached_or_fetch_weather(
             records.append(w_df)
 
     if not records:
-        print("[AirSense Weather Warning] No weather data retrieved.")
+        print("[Vayu Weather Warning] No weather data retrieved.")
         return pd.DataFrame()
 
     full_weather = pd.concat(records, ignore_index=True)
     full_weather.sort_values(by=["City", "Date"], inplace=True)
     cache_path.parent.mkdir(parents=True, exist_ok=True)
     full_weather.to_csv(cache_path, index=False)
-    print(f"[AirSense Weather] Successfully cached {len(full_weather)} weather records to {cache_path}")
+    print(f"[Vayu Weather] Successfully cached {len(full_weather)} weather records to {cache_path}")
     return full_weather
 
 
@@ -349,7 +349,7 @@ def build_feature_dataset(
     if not clean_p.is_file():
         raise FileNotFoundError(f"Cleaned dataset not found at '{clean_p}'. Run src.preprocessing first.")
 
-    print(f"[AirSense Features] Loading cleaned data from: {clean_p}")
+    print(f"[Vayu Features] Loading cleaned data from: {clean_p}")
     df = pd.read_csv(clean_p, parse_dates=["Date"])
     df.sort_values(by=["City", "Date"], inplace=True)
     df.reset_index(drop=True, inplace=True)
@@ -361,7 +361,7 @@ def build_feature_dataset(
     weather_df = get_cached_or_fetch_weather(cities, min_date, max_date, Path(weather_cache))
 
     if not weather_df.empty:
-        print("[AirSense Features] Merging weather features with air quality records...")
+        print("[Vayu Features] Merging weather features with air quality records...")
         df = pd.merge(df, weather_df, on=["City", "Date"], how="left")
         # Fill any minor weather missing boundary with forward/backward fill per city
         weather_cols = ["temp_mean", "humidity_mean", "precipitation", "wind_speed_max", "wind_direction"]
@@ -370,23 +370,23 @@ def build_feature_dataset(
                 df[c] = df.groupby("City")[c].transform(lambda s: s.ffill().bfill())
 
     # 2. Add temporal & calendar features
-    print("[AirSense Features] Adding calendar and cyclical seasonal features...")
+    print("[Vayu Features] Adding calendar and cyclical seasonal features...")
     df = add_temporal_features(df)
 
     # 3. Add lag features
-    print("[AirSense Features] Engineering multi-day autoregressive lags (1, 2, 3, 7 days)...")
+    print("[Vayu Features] Engineering multi-day autoregressive lags (1, 2, 3, 7 days)...")
     df = add_lag_features(df)
 
     # 4. Add rolling window features
-    print("[AirSense Features] Engineering shifted rolling statistics (3, 7, 14 days)...")
+    print("[Vayu Features] Engineering shifted rolling statistics (3, 7, 14 days)...")
     df = add_rolling_features(df)
 
     # 5. Add forecast targets
-    print("[AirSense Features] Creating forecast targets (24h, 48h, 72h ahead)...")
+    print("[Vayu Features] Creating forecast targets (24h, 48h, 72h ahead)...")
     df = add_forecast_targets(df)
 
     # 6. Drop burn-in rows caused by 14-day rolling window
-    print("[AirSense Features] Dropping burn-in lag rows...")
+    print("[Vayu Features] Dropping burn-in lag rows...")
     # Rows with NaN in AQI_rolling_mean_14 are the initial 14 days per city
     df_clean = df.dropna(subset=["AQI_rolling_mean_14"]).copy()
 
@@ -400,8 +400,8 @@ def build_feature_dataset(
     out_p = Path(output_path)
     out_p.parent.mkdir(parents=True, exist_ok=True)
     df_clean.to_csv(out_p, index=False)
-    print(f"[AirSense Features] Feature engineering complete! Total samples: {len(df_clean)}, Total features: {len(df_clean.columns)}")
-    print(f"[AirSense Features] Saved to: {out_p}")
+    print(f"[Vayu Features] Feature engineering complete! Total samples: {len(df_clean)}, Total features: {len(df_clean.columns)}")
+    print(f"[Vayu Features] Saved to: {out_p}")
 
     return df_clean
 

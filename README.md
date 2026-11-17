@@ -1,4 +1,4 @@
-# 🌬️ AirSense: Air Quality Forecasting & Health Alert Platform
+# 🌬️ Vayu: Air Quality Forecasting & Health Alert Platform
 
 [![Python 3.11+](https://img.shields.io/badge/Python-3.11+-3776AB?style=flat&logo=python&logoColor=white)](https://python.org)
 [![Streamlit](https://img.shields.io/badge/Streamlit-1.30+-FF4B4B?style=flat&logo=streamlit&logoColor=white)](https://streamlit.io)
@@ -31,7 +31,7 @@
 
 ## 🚀 Live Demo & Video
 
-- **🌐 Live Web App:** [https://airsense-india.streamlit.app](https://share.streamlit.io) *(Deployable on Streamlit Community Cloud)*
+- **🌐 Live Web App:** [https://vayu-india.streamlit.app](https://share.streamlit.io) *(Deployable on Streamlit Community Cloud)*
 - **🎥 2-Minute Demo Video:** [Watch Project Walkthrough on YouTube](https://youtube.com) *(Insert your recording link here)*
 
 ---
@@ -88,19 +88,28 @@ flowchart TD
 
 ## ✨ Key Features
 
+0. **📡 Live Data Mode (default):**
+   - Pulls current hourly pollutants (Open-Meteo air-quality API, Copernicus **CAMS** model) and weather for all 8 cities — no API key needed, cached for 30 minutes.
+   - Converts them to a CPCB AQI (24-h means for PM2.5/PM10/NO₂/SO₂, 8-h maximum for CO), rebuilds the exact training features and produces **live 24/48/72 h forecasts**, shown next to the CAMS physics-model forecast for comparison.
+   - Hourly PM2.5 outlook with the **best 2-hour window** to go outside. A sidebar toggle switches to the 2015–2020 CPCB archive; the app falls back to it automatically if the live fetch fails.
+   - CAMS over-estimates surface ozone over India, so O₃ is displayed but excluded from the live AQI.
 1. **Multi-Horizon ML Forecasting (24h, 48h, 72h):**
-   - Predicts multi-step future AQI with 95% confidence intervals using gradient boosted decision trees.
-2. **Interactive National Geospatial Map:**
-   - Color-coded Folium markers across 8 major Indian cities with CPCB category classification and pollutant popups.
-3. **Multi-City Comparison Hub:**
-   - Compare multi-year historical trajectories, monthly seasonality patterns, and pollutant distributions side-by-side.
-4. **"Should I Go Out?" Outdoor Safety Score (0–100):**
-   - Personalizes risk assessments across four vulnerability profiles (*General Public, Asthma Patients, Elderly/Children, Outdoor Workers*).
-5. **Game-Theoretic Explainability (SHAP):**
-   - Demystifies black-box predictions by visualizing exact Shapley value contributions for each atmospheric variable.
-6. **Multi-Channel Alert Dispatch:**
-   - Transmits urgent warnings via responsive HTML email and Telegram when forecasted AQI crosses user-defined hazard thresholds.
-7. **Production MLOps & GitHub Actions:**
+   - Predicts multi-step future AQI with **calibrated 90% prediction intervals**, derived from the models' real errors on the 2020 hold-out period (not fixed margins).
+2. **Dashboard with Pollutant Breakdown:**
+   - Latest conditions with day-over-day deltas and sparklines, a 72h forecast chart over CPCB bands, the **dominant pollutant** via CPCB sub-indices, cigarette-equivalent and WHO-guideline exposure, and CSV export.
+3. **Interactive National Geospatial Map:**
+   - AQI-labelled markers for 8 cities, switchable between latest recorded and +24/48/72h forecasts, with a ranking table and 30-day sparklines.
+4. **"Should I Go Out?" Planner (0–100):**
+   - Safety scores for today and the next 3 days per vulnerability profile (*General Public, Asthma Patients, Elderly/Children, Outdoor Workers*), best-day recommendation and a precautions checklist.
+5. **Live Explainability (SHAP) + What-If Simulator:**
+   - Per-city TreeSHAP waterfall computed on demand with a plain-language summary, plus sliders to test how the forecast responds to pollution and weather changes.
+6. **Model Performance Page:**
+   - Hold-out MAE / R² / CPCB category hit rate per horizon, forecast-vs-actual charts with interval coverage, per-city error and a category confusion matrix.
+7. **City Comparison & Insights:**
+   - Smoothed trends, month × city heatmap, GitHub-style calendar heatmap, pollutant distributions vs WHO guidelines, dominant-pollutant share, and a **COVID-19 lockdown impact** analysis (2020 vs 2019).
+8. **Alert Center (Email & Telegram):**
+   - Scans every city's 72h forecast against a threshold, previews the HTML email and Telegram text, and dispatches (or simulates without credentials).
+9. **Production MLOps & GitHub Actions:**
    - Daily scheduled cron workflow (`0 0 * * *`) that refreshes weather data, retrains models, evaluates performance, and auto-deploys updates.
 
 ---
@@ -130,7 +139,7 @@ TreeSHAP reveals the atmospheric factors influencing forecasts:
 
 ## 🩺 CPCB Regulatory Standards & Health Advisories
 
-AirSense adheres to the **Central Pollution Control Board (CPCB) NAQI** standards:
+Vayu adheres to the **Central Pollution Control Board (CPCB) NAQI** standards:
 
 | Category | AQI Range | Color Code | General Public Advice | Asthma / Vulnerable Groups |
 | :--- | :---: | :---: | :--- | :--- |
@@ -146,7 +155,7 @@ AirSense adheres to the **Central Pollution Control Board (CPCB) NAQI** standard
 ## 📁 Project Structure
 
 ```
-airsense/
+vayu/
 ├── .github/workflows/
 │   └── retrain_and_refresh.yml   # Daily GitHub Actions automated retraining
 ├── .streamlit/
@@ -185,8 +194,8 @@ airsense/
 
 ### 1. Clone & Set Up Environment
 ```bash
-git clone https://github.com/<your-username>/airsense.git
-cd airsense
+git clone https://github.com/amitt222/vayu.git
+cd vayu
 python -m venv venv
 
 # Activate Virtualenv (Windows)

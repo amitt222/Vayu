@@ -1,5 +1,5 @@
 """
-AirSense - EDA and Visualizations Generator
+Vayu - EDA and Visualizations Generator
 Generates and saves publication-quality exploratory plots to `notebooks/plots/`.
 Covers missing data diagnostics, outlier treatment, per-city trends,
 seasonality, and pollutant correlation matrices.
@@ -50,7 +50,7 @@ def plot_missing_values(raw_df: pd.DataFrame, cleaned_df: pd.DataFrame) -> None:
     output_path = PLOTS_DIR / "01_missing_values_profile.png"
     plt.savefig(output_path, dpi=300)
     plt.close()
-    print(f"[AirSense EDA] Saved: {output_path}")
+    print(f"[Vayu EDA] Saved: {output_path}")
 
 
 def plot_city_distributions(df: pd.DataFrame) -> None:
@@ -87,7 +87,7 @@ def plot_city_distributions(df: pd.DataFrame) -> None:
     output_path = PLOTS_DIR / "02_city_aqi_distributions.png"
     plt.savefig(output_path, dpi=300)
     plt.close()
-    print(f"[AirSense EDA] Saved: {output_path}")
+    print(f"[Vayu EDA] Saved: {output_path}")
 
 
 def plot_historical_trends(df: pd.DataFrame) -> None:
@@ -115,7 +115,7 @@ def plot_historical_trends(df: pd.DataFrame) -> None:
     output_path = PLOTS_DIR / "03_historical_trends_lockdown.png"
     plt.savefig(output_path, dpi=300)
     plt.close()
-    print(f"[AirSense EDA] Saved: {output_path}")
+    print(f"[Vayu EDA] Saved: {output_path}")
 
 
 def plot_seasonality(df: pd.DataFrame) -> None:
@@ -153,7 +153,7 @@ def plot_seasonality(df: pd.DataFrame) -> None:
     output_path = PLOTS_DIR / "04_monthly_seasonality.png"
     plt.savefig(output_path, dpi=300)
     plt.close()
-    print(f"[AirSense EDA] Saved: {output_path}")
+    print(f"[Vayu EDA] Saved: {output_path}")
 
 
 def plot_correlations(df: pd.DataFrame) -> None:
@@ -179,7 +179,7 @@ def plot_correlations(df: pd.DataFrame) -> None:
     output_path = PLOTS_DIR / "05_pollutant_correlations.png"
     plt.savefig(output_path, dpi=300)
     plt.close()
-    print(f"[AirSense EDA] Saved: {output_path}")
+    print(f"[Vayu EDA] Saved: {output_path}")
 
 
 def plot_cpcb_categories(df: pd.DataFrame) -> None:
@@ -215,38 +215,38 @@ def plot_cpcb_categories(df: pd.DataFrame) -> None:
     output_path = PLOTS_DIR / "06_cpcb_category_distribution.png"
     plt.savefig(output_path, dpi=300)
     plt.close()
-    print(f"[AirSense EDA] Saved: {output_path}")
+    print(f"[Vayu EDA] Saved: {output_path}")
 
 
 def run_full_eda() -> None:
     """Executes the full EDA routine and saves all figures."""
-    print("[AirSense EDA] Loading and filtering raw dataset...")
+    print("[Vayu EDA] Loading and filtering raw dataset...")
     raw_df = load_raw_city_day()
     target_raw_df = filter_target_cities(raw_df)
 
-    print("[AirSense EDA] Executing cleaning pipeline...")
+    print("[Vayu EDA] Executing cleaning pipeline...")
     cleaned_df = clean_and_preprocess_dataset(target_raw_df)
     save_cleaned_data(cleaned_df)
 
-    print("[AirSense EDA] Generating Figure 1: Missing values profile...")
+    print("[Vayu EDA] Generating Figure 1: Missing values profile...")
     plot_missing_values(target_raw_df, cleaned_df)
 
-    print("[AirSense EDA] Generating Figure 2: City AQI distributions...")
+    print("[Vayu EDA] Generating Figure 2: City AQI distributions...")
     plot_city_distributions(cleaned_df)
 
-    print("[AirSense EDA] Generating Figure 3: Historical trends & lockdown...")
+    print("[Vayu EDA] Generating Figure 3: Historical trends & lockdown...")
     plot_historical_trends(cleaned_df)
 
-    print("[AirSense EDA] Generating Figure 4: Monthly seasonality...")
+    print("[Vayu EDA] Generating Figure 4: Monthly seasonality...")
     plot_seasonality(cleaned_df)
 
-    print("[AirSense EDA] Generating Figure 5: Correlation matrix...")
+    print("[Vayu EDA] Generating Figure 5: Correlation matrix...")
     plot_correlations(cleaned_df)
 
-    print("[AirSense EDA] Generating Figure 6: CPCB Category distribution...")
+    print("[Vayu EDA] Generating Figure 6: CPCB Category distribution...")
     plot_cpcb_categories(cleaned_df)
 
-    print("\n[AirSense EDA] All EDA plots generated successfully in notebooks/plots/!")
+    print("\n[Vayu EDA] All EDA plots generated successfully in notebooks/plots/!")
 
 
 if __name__ == "__main__":

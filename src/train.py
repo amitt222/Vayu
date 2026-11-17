@@ -1,6 +1,6 @@
 """
-AirSense - Model Training & Benchmarking Pipeline
-Author: AirSense Team
+Vayu - Model Training & Benchmarking Pipeline
+Author: Vayu Team
 Description:
     Implements chronological (time-based) train/validation/test splitting,
     trains Naive Persistence, XGBoost, LightGBM, and an LSTM / tree comparison model.
@@ -135,7 +135,7 @@ def create_time_based_split(
         "feature_cols": feature_cols,
     }
 
-    print(f"[AirSense Split] Chronological Data Split:")
+    print(f"[Vayu Split] Chronological Data Split:")
     print(f"  -> Train samples : {len(train_df)} ({train_df['Date'].min().date()} to {train_df['Date'].max().date()})")
     print(f"  -> Val samples   : {len(val_df)} ({val_df['Date'].min().date()} to {val_df['Date'].max().date()})")
     print(f"  -> Test samples  : {len(test_df)} ({test_df['Date'].min().date()} to {test_df['Date'].max().date()})")
@@ -268,14 +268,14 @@ def train_lstm_regressor(split_data: Dict[str, Any]) -> Dict[str, Any]:
         Dict[str, Any]: Model dictionary with metrics and predictions.
     """
     if not HAS_TORCH:
-        print("[AirSense Model] PyTorch not detected. Training Random Forest Regressor as comparison model...")
+        print("[Vayu Model] PyTorch not detected. Training Random Forest Regressor as comparison model...")
         rf = RandomForestRegressor(n_estimators=150, max_depth=10, random_state=42, n_jobs=-1)
         rf.fit(split_data["X_train"], split_data["y_train_1d"])
         y_pred = rf.predict(split_data["X_test"])
         metrics = calculate_metrics(split_data["y_test_1d"], y_pred, model_name="Random Forest (Comparison)")
         return {"model": rf, "predictions": y_pred, "metrics": metrics}
 
-    print("[AirSense Model] Training PyTorch LSTM Comparison Model...")
+    print("[Vayu Model] Training PyTorch LSTM Comparison Model...")
     scaler = StandardScaler()
     X_train_scaled = scaler.fit_transform(split_data["X_train"])
     X_test_scaled = scaler.transform(split_data["X_test"])
@@ -327,7 +327,7 @@ def train_multi_horizon_models(
         Dict[str, Any]: Dictionary containing models for each horizon.
     """
     horizon_models = {}
-    print("\n[AirSense Model] Training Multi-Horizon Forecasting Models (24h, 48h, 72h)...")
+    print("\n[Vayu Model] Training Multi-Horizon Forecasting Models (24h, 48h, 72h)...")
 
     for horizon in [1, 2, 3]:
         y_train = split_data[f"y_train_{horizon}d"]
@@ -380,10 +380,10 @@ def run_training_pipeline() -> Tuple[pd.DataFrame, Any]:
     Returns:
         Tuple[pd.DataFrame, Any]: Comparison DataFrame and best model.
     """
-    print("[AirSense Training] Loading feature dataset...")
+    print("[Vayu Training] Loading feature dataset...")
     df_encoded, feature_cols = load_and_encode_dataset()
 
-    print("[AirSense Training] Splitting chronologically...")
+    print("[Vayu Training] Splitting chronologically...")
     split_data = create_time_based_split(df_encoded, feature_cols)
 
     # 1. Baseline
@@ -418,7 +418,7 @@ def run_training_pipeline() -> Tuple[pd.DataFrame, Any]:
 
     # Determine Best Model (lowest MAE)
     best_model_name = comparison_table.iloc[0]["Model"]
-    print(f"[AirSense Training] Best Performing Model: {best_model_name}")
+    print(f"[Vayu Training] Best Performing Model: {best_model_name}")
 
     if "XGBoost" in best_model_name:
         best_model = xgb_res["model"]
@@ -437,7 +437,7 @@ def run_training_pipeline() -> Tuple[pd.DataFrame, Any]:
     multi_models = train_multi_horizon_models(split_data, best_algorithm=best_algo)
 
     # 7. Persist Artifacts
-    print("\n[AirSense Training] Saving artifacts to models/ directory...")
+    print("\n[Vayu Training] Saving artifacts to models/ directory...")
     joblib.dump(best_model, MODELS_DIR / "best_model.joblib")
     joblib.dump(xgb_res["model"], MODELS_DIR / "xgboost_model.joblib")
     joblib.dump(lgb_res["model"], MODELS_DIR / "lightgbm_model.joblib")
@@ -461,7 +461,7 @@ def run_training_pipeline() -> Tuple[pd.DataFrame, Any]:
     test_results_df["pred_best"] = best_preds
     test_results_df.to_csv(MODELS_DIR / "test_evaluation_results.csv", index=False)
 
-    print(f"[AirSense Training] All artifacts successfully saved to {MODELS_DIR}!")
+    print(f"[Vayu Training] All artifacts successfully saved to {MODELS_DIR}!")
     return comparison_table, best_model
 
 

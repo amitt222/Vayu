@@ -58,3 +58,6 @@ data/raw/*
 
 # Streamlit config & cache
 .streamlit/secrets.toml
+
+# Personal training report (kept local)
+docs/ITR_Report_Vayu.*

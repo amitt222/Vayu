@@ -1,6 +1,6 @@
 """
-AirSense - Explainability Module (SHAP)
-Author: AirSense Team
+Vayu - Explainability Module (SHAP)
+Author: Vayu Team
 Description:
     Leverages TreeSHAP (Shapley Additive exPlanations) to interpret machine learning
     predictions globally (overall feature importance and directional impact) and
@@ -107,11 +107,11 @@ def generate_shap_summary_plot(
 
     plt.figure(figsize=(11, 7))
     shap.plots.beeswarm(shap_explanation, max_display=max_display, show=False)
-    plt.title("AirSense - Global SHAP Feature Impact (Beeswarm Plot)", fontsize=13, fontweight="bold", pad=15)
+    plt.title("Vayu - Global SHAP Feature Impact (Beeswarm Plot)", fontsize=13, fontweight="bold", pad=15)
     plt.tight_layout()
     plt.savefig(out, dpi=300, bbox_inches="tight")
     plt.close()
-    print(f"[AirSense SHAP] Saved Beeswarm Summary Plot to: {out}")
+    print(f"[Vayu SHAP] Saved Beeswarm Summary Plot to: {out}")
     return out
 
 
@@ -136,11 +136,11 @@ def generate_shap_bar_plot(
 
     plt.figure(figsize=(10, 6))
     shap.plots.bar(shap_explanation, max_display=max_display, show=False)
-    plt.title("AirSense - Global Feature Importance (Mean |SHAP Value|)", fontsize=13, fontweight="bold", pad=15)
+    plt.title("Vayu - Global Feature Importance (Mean |SHAP Value|)", fontsize=13, fontweight="bold", pad=15)
     plt.tight_layout()
     plt.savefig(out, dpi=300, bbox_inches="tight")
     plt.close()
-    print(f"[AirSense SHAP] Saved Feature Importance Bar Plot to: {out}")
+    print(f"[Vayu SHAP] Saved Feature Importance Bar Plot to: {out}")
     return out
 
 
@@ -170,12 +170,12 @@ def generate_waterfall_plot(
 
     plt.figure(figsize=(10, 6))
     shap.plots.waterfall(shap_explanation[index], max_display=max_display, show=False)
-    title = f"AirSense - Prediction Explanation (Waterfall Plot) {title_suffix}".strip()
+    title = f"Vayu - Prediction Explanation (Waterfall Plot) {title_suffix}".strip()
     plt.title(title, fontsize=12, fontweight="bold", pad=15)
     plt.tight_layout()
     plt.savefig(out, dpi=300, bbox_inches="tight")
     plt.close()
-    print(f"[AirSense SHAP] Saved Waterfall Plot to: {out}")
+    print(f"[Vayu SHAP] Saved Waterfall Plot to: {out}")
     return out
 
 
@@ -243,13 +243,13 @@ def run_explainability_pipeline() -> None:
     if not model_path.is_file():
         raise FileNotFoundError(f"Model not found at {model_path}. Run src.train first.")
 
-    print(f"[AirSense SHAP] Loading best model from: {model_path}")
+    print(f"[Vayu SHAP] Loading best model from: {model_path}")
     model = joblib.load(model_path)
 
-    print("[AirSense SHAP] Loading holdout test feature records...")
+    print("[Vayu SHAP] Loading holdout test feature records...")
     X_sample, meta_sample, feature_cols = load_test_features_sample(sample_size=400)
 
-    print("[AirSense SHAP] Initializing TreeExplainer and calculating Shapley values...")
+    print("[Vayu SHAP] Initializing TreeExplainer and calculating Shapley values...")
     explainer = get_tree_explainer(model)
     shap_values = explainer(X_sample)
 
@@ -287,7 +287,7 @@ def run_explainability_pipeline() -> None:
         "base_value": float(explainer.expected_value),
     }, MODELS_DIR / "shap_interactive_cache.joblib")
 
-    print("[AirSense SHAP] Explainability pipeline completed successfully!")
+    print("[Vayu SHAP] Explainability pipeline completed successfully!")
 
 
 if __name__ == "__main__":
