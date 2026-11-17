@@ -194,7 +194,7 @@ vayu/
 
 ### 1. Clone & Set Up Environment
 ```bash
-git clone https://github.com/amitt222/vayu.git
+git clone https://github.com/amitt222/Vayu.git
 cd vayu
 python -m venv venv
 
